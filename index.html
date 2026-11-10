@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Orçun Madran | Akademi • Açık Bilim • Yapay Zeka • Triatlon & Maraton</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Space Grotesk & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#090D16',
+                            card: '#111827',
+                            cyan: '#06B6D4',
+                            emerald: '#10B981',
+                            orange: '#F97316'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Özel Kaydırma Çubuğu ve Arka Plan Efektleri */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090D16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06B6D4;
+        }
+
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+        }
+
+        .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        html:not(.dark) .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .neon-border:hover {
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25);
+        }
+
+        .strava-border:hover {
+            border-color: rgba(249, 115, 22, 0.5);
+            box-shadow: 0 0 25px -5px rgba(249, 115, 22, 0.25);
+        }
+
+        /* Özel Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: #10B981;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+            transition: transform 0.15s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        html:not(.dark) input[type=range]::-webkit-slider-runnable-track {
+            background: #cbd5e1;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-cyber-dark dark:text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-white transition-colors duration-300 relative overflow-x-hidden">
+
+    <!-- Arka Plan Işık Efektleri ve Kanvas -->
+    <canvas id="particle-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-60 dark:opacity-100"></canvas>
+    <div class="fixed inset-0 bg-grid-pattern pointer-events-none z-0"></div>
+    <div class="fixed top-[-10%] left-[-10%] w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+    <!-- Üst Navigasyon -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <nav class="glass-card rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between">
+                <!-- Logo / İsim -->
+                <a href="#hero" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center text-white font-display font-bold text-lg shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+                        OM
+                    </div>
+                    <div>
+                        <span class="font-display font-bold text-lg tracking-tight block leading-none">Orçun Madran</span>
+                        <span class="font-mono text-[11px] text-cyan-600 dark:text-cyan-400 tracking-wider uppercase">Açık Bilim • YZ • Endurance</span>
+                    </div>
+                </a>
+
+                <!-- Masaüstü Menü -->
+                <div class="hidden md:flex items-center space-x-1 lg:space-x-2 text-sm font-medium">
+                    <a href="#akademi" class="px-3 py-2 rounded-xl hover:bg-slate-200/60 dark:hover:bg-white/5 hover:text-cyan-500 transition-colors">Akademi & Açık Kültür</a>
+                    <a href="#ai-lab" class="px-3 py-2 rounded-xl hover:bg-slate-200/60 dark:hover:bg-white/5 hover:text-cyan-500 transition-colors">YZ & Lisans Lab</a>
+                    <a href="#endurance" class="px-3 py-2 rounded-xl hover:bg-slate-200/60 dark:hover:bg-white/5 hover:text-orange-500 transition-colors flex items-center gap-1.5">
+                        <i class="fa-solid fa-fire-flame-curved text-orange-500"></i> Spor & Dayanıklılık
+                    </a>
+                    <a href="#akis" class="px-3 py-2 rounded-xl hover:bg-slate-200/60 dark:hover:bg-white/5 hover:text-emerald-500 transition-colors">Gündem & Yayınlar</a>
+                </div>
+
+                <!-- Sağ Aksiyonlar (Tema & Hızlı Bağlantı) -->
+                <div class="flex items-center space-x-2">
+                    <!-- Canlı Yayın Durum Rozeti -->
+                    <a href="#akademi" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-mono">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        <span>Akademiden Notlar</span>
+                    </a>
+
+                    <!-- Tema Değiştirici -->
+                    <button id="theme-toggle" aria-label="Temayı Değiştir" class="p-2.5 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 hover:bg-cyan-500/20 text-slate-700 dark:text-slate-200 transition-all">
+                        <i class="fa-solid fa-sun hidden dark:inline text-amber-400"></i>
+                        <i class="fa-solid fa-moon inline dark:hidden text-slate-700"></i>
+                    </button>
+
+                    <!-- Mobil Menü Butonu -->
+                    <button id="mobile-menu-btn" aria-label="Menü" class="md:hidden p-2.5 rounded-xl bg-slate-200/70 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Mobil Açılır Menü -->
+            <div id="mobile-menu" class="hidden md:hidden mt-2 glass-card rounded-2xl p-4 space-y-2 text-sm font-medium">
+                <a href="#akademi" class="mobile-link block px-4 py-2.5 rounded-xl hover:bg-cyan-500/10">Akademi & Açık Kültür</a>
+                <a href="#ai-lab" class="mobile-link block px-4 py-2.5 rounded-xl hover:bg-cyan-500/10">YZ & Açık Lisans Laboratuvarı</a>
+                <a href="#endurance" class="mobile-link block px-4 py-2.5 rounded-xl hover:bg-orange-500/10 text-orange-500 font-semibold">Dayanıklılık & Spor Günlüğü</a>
+                <a href="#akis" class="mobile-link block px-4 py-2.5 rounded-xl hover:bg-emerald-500/10">Akademiden Notlar & İletişim</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ANA İÇERİK -->
+    <main class="relative z-10 pt-28 sm:pt-32 pb-20 space-y-24 sm:space-y-32">
+
+        <!-- 1. HERO BÖLÜMÜ -->
+        <section id="hero" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+                
+                <!-- Sol Sütun: Tanıtım ve Başlık -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs sm:text-sm font-mono">
+                        <i class="fa-brands fa-creative-commons text-base"></i>
+                        <span>Açık Bilim, Teknoloji ve Dayanıklılık Kesişimi</span>
+                    </div>
+
+                    <h1 class="font-display text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1]">
+                        Dr. Orçun <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-emerald-400 to-cyan-500">Madran</span>
+                    </h1>
+
+                    <!-- Dinamik Daktilo Alt Başlık -->
+                    <div class="h-8 sm:h-10 flex items-center font-mono text-sm sm:text-lg text-slate-600 dark:text-slate-300">
+                        <span class="text-emerald-500 mr-2">&gt;</span>
+                        <span id="typewriter-text" class="font-semibold"></span>
+                        <span class="w-2 h-5 bg-cyan-400 ml-1 animate-pulse"></span>
+                    </div>
+
+                    <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                        <strong>Hacettepe Üniversitesi</strong> Bilgi ve Belge Yönetimi Bölümü'nde akademisyen, <strong>Creative Commons Türkiye</strong> kurucu ekip üyesi. Bilginin özgürce paylaşılması, açık erişim, eğitimde yapay zeka uygulamaları ve dijital okuryazarlık üzerine çalışıyor; kalan zamanlarında ise <strong>maraton, triatlon ve yol bisikleti</strong> parkurlarında sınırları zorluyor.
+                    </p>
+
+                    <!-- Aksiyon Butonları -->
+                    <div class="flex flex-wrap gap-3 sm:gap-4 pt-2">
+                        <a href="#akademi" class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-semibold shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                            <span>Projeler & Açık Bilim</span>
+                        </a>
+                        <a href="#endurance" class="px-6 py-3.5 rounded-xl glass-card hover:border-orange-500/50 text-slate-800 dark:text-slate-100 font-semibold transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-person-running text-orange-500"></i>
+                            <span>Spor & Yarış Takvimi</span>
+                        </a>
+                        <a href="#ai-lab" class="px-5 py-3.5 rounded-xl glass-card hover:border-cyan-500/50 text-slate-700 dark:text-slate-300 font-mono text-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i>
+                            <span>CC Lisans Seçici</span>
+                        </a>
+                    </div>
+
+                    <!-- Hızlı İstatistik Barı -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6">
+                        <div class="glass-card p-3.5 rounded-2xl border-l-4 border-l-cyan-500">
+                            <div class="text-xs font-mono text-slate-400">AKADEMİ</div>
+                            <div class="font-display font-bold text-sm sm:text-base mt-0.5">Hacettepe BBY</div>
+                        </div>
+                        <div class="glass-card p-3.5 rounded-2xl border-l-4 border-l-emerald-500">
+                            <div class="text-xs font-mono text-slate-400">AÇIK KÜLTÜR</div>
+                            <div class="font-display font-bold text-sm sm:text-base mt-0.5">CC Türkiye</div>
+                        </div>
+                        <div class="glass-card p-3.5 rounded-2xl border-l-4 border-l-purple-500">
+                            <div class="text-xs font-mono text-slate-400">CANLI YAYIN</div>
+                            <div class="font-display font-bold text-sm sm:text-base mt-0.5">Akademiden Notlar</div>
+                        </div>
+                        <div class="glass-card p-3.5 rounded-2xl border-l-4 border-l-orange-500">
+                            <div class="text-xs font-mono text-slate-400">ENDURANCE</div>
+                            <div class="font-display font-bold text-sm sm:text-base mt-0.5">Ironman 70.3 & 42.2K</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sağ Sütun: İnteraktif Kimlik & Durum Kartı -->
+                <div class="lg:col-span-5">
+                    <div class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border border-cyan-500/20 shadow-2xl">
+                        <!-- Sağ Üst Dekoratif Rozet -->
+                        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                            </div>
+                            <span class="font-mono text-xs text-slate-400">madran.net // profil_v2026.sh</span>
+                        </div>
+
+                        <!-- Profil Özeti Görseli / SVG Avatar & Telemetri -->
+                        <div class="flex items-center gap-5 mb-6">
+                            <div class="relative w-20 h-20 rounded-2xl bg-gradient-to-tr from-cyan-600 via-slate-800 to-emerald-500 p-0.5 shadow-lg shrink-0">
+                                <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-3xl text-cyan-400">
+                                    <i class="fa-solid fa-user-astronaut"></i>
+                                </div>
+                                <span class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-slate-900 flex items-center justify-center text-[10px] text-white" title="Aktif">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <h2 class="font-display font-bold text-xl">Rafet Orçun Madran</h2>
+                                <p class="text-xs font-mono text-cyan-500">Dr. Öğr. Üyesi • Ankara, TR</p>
+                                <div class="flex flex-wrap gap-1.5 mt-2">
+                                    <span class="px-2 py-0.5 text-[11px] rounded-md bg-cyan-500/10 text-cyan-400 font-mono">#AçıkErişim</span>
+                                    <span class="px-2 py-0.5 text-[11px] rounded-md bg-emerald-500/10 text-emerald-400 font-mono">#YapayZeka</span>
+                                    <span class="px-2 py-0.5 text-[11px] rounded-md bg-orange-500/10 text-orange-400 font-mono">#Triatlon</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Canlı Odak Alanları Telemetrisi -->
+                        <div class="space-y-4 font-mono text-xs">
+                            <div class="p-3.5 rounded-2xl bg-slate-900/60 dark:bg-slate-950/60 text-slate-200 border border-slate-800">
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span><i class="fa-solid fa-microchip text-cyan-400 mr-1.5"></i>GÜNCEL ARAŞTIRMA ODAĞI</span>
+                                    <span class="text-emerald-400">AKTİF</span>
+                                </div>
+                                <p class="text-slate-100 font-sans text-sm">Akademik Üretkenlikte Yapay Zeka, Açık Eğitim Kaynakları (OER) ve Haber/Bilgi Okuryazarlığı Oyunlaştırması.</p>
+                            </div>
+
+                            <div class="p-3.5 rounded-2xl bg-slate-900/60 dark:bg-slate-950/60 text-slate-200 border border-slate-800">
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span><i class="fa-solid fa-flag-checkered text-orange-400 mr-1.5"></i>SIRADAKİ ANA HEDEF YARIŞ</span>
+                                    <span class="text-orange-400">42.195 KM</span>
+                                </div>
+                                <div class="flex items-center justify-between font-sans">
+                                    <span class="text-sm font-semibold text-white">Valencia Marathon Trinidad Alfonso</span>
+                                    <span class="px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 font-mono text-xs">6 Ara 2026</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hızlı Mod Değiştirici (Akademik vs Sporcu Modu Vurgusu) -->
+                        <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                            <span><i class="fa-solid fa-terminal mr-1 text-cyan-500"></i> Açık Kaynak & Özgür Bilgi</span>
+                            <a href="#ai-lab" class="text-cyan-500 hover:underline font-medium">Araçları Keşfet &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 2. AKADEMİ & AÇIK KÜLTÜR BÖLÜMÜ -->
+        <section id="akademi" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                <div>
+                    <div class="inline-flex items-center space-x-2 text-cyan-500 font-mono text-xs uppercase tracking-widest mb-2">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Bölüm 01 // Akademi, Açık Bilim ve Dijital Okuryazarlık</span>
+                    </div>
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold">Bilgiyi Açık, Erişilebilir ve Etkileşimli Kılmak</h2>
+                </div>
+                
+                <!-- Kategori Filtre Butonları -->
+                <div class="flex flex-wrap gap-2" id="academic-filters">
+                    <button data-filter="all" class="filter-btn active px-4 py-2 rounded-xl text-xs font-mono bg-cyan-500 text-white font-semibold transition-all">Tümü</button>
+                    <button data-filter="open" class="filter-btn px-4 py-2 rounded-xl text-xs font-mono glass-card hover:border-cyan-500/40 transition-all">Açık Bilim & CC</button>
+                    <button data-filter="projects" class="filter-btn px-4 py-2 rounded-xl text-xs font-mono glass-card hover:border-cyan-500/40 transition-all">Erasmus+ & Oyunlaştırma</button>
+                    <button data-filter="media" class="filter-btn px-4 py-2 rounded-xl text-xs font-mono glass-card hover:border-cyan-500/40 transition-all">Akademiden Notlar</button>
+                </div>
+            </div>
+
+            <!-- Akademik Kartlar Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="academic-grid">
+                
+                <!-- Kart 1: Creative Commons Türkiye & Açık Bilim -->
+                <article data-category="open" class="academic-card glass-card rounded-3xl p-6 sm:p-7 neon-border transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-brands fa-creative-commons"></i>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 font-mono text-xs">Açık Kültür & Hukuk</span>
+                        <h3 class="font-display text-xl font-bold mt-3 mb-2">Creative Commons Türkiye & Açık Bilim</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Bilimsel yayınların, eğitim materyallerinin ve kültürel mirasın kamu yararına açık lisanslarla paylaşılması için yürütülen çalışmalar. Türkçe CC Lisans Seçici, açık erişim politikaları ve GLAM (Galeriler, Kütüphaneler, Arşivler, Müzeler) projeleri.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="text-emerald-500"><i class="fa-solid fa-check-circle mr-1"></i>CC BY 4.0 Standartları</span>
+                        <a href="#ai-lab" class="text-cyan-400 hover:underline">Lisans Seçiciyi Dene &rarr;</a>
+                    </div>
+                </article>
+
+                <!-- Kart 2: Akademiden Notlar -->
+                <article data-category="media" class="academic-card glass-card rounded-3xl p-6 sm:p-7 neon-border transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-podcast"></i>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 font-mono text-xs">Haftalık Canlı Yayın & Podcast</span>
+                        <h3 class="font-display text-xl font-bold mt-3 mb-2">Akademiden Notlar</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Yükseköğretim gündemi, açık bilim gelişmeleri, üretken yapay zeka araçlarının akademik araştırmalara etkisi ve eğitim teknolojileri üzerine her hafta gerçekleştirilen bağımsız canlı yayın ve tartışma serisi.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="text-purple-400"><i class="fa-brands fa-youtube mr-1"></i>Canlı Yayın & Arşiv</span>
+                        <a href="#akis" class="text-emerald-400 hover:underline">Son Konulara Bak &rarr;</a>
+                    </div>
+                </article>
+
+                <!-- Kart 3: NEED & ESSENTIAL Projeleri -->
+                <article data-category="projects" class="academic-card glass-card rounded-3xl p-6 sm:p-7 neon-border transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-dice-d20"></i>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md bg-purple-500/10 text-purple-400 font-mono text-xs">Erasmus+ & Oyunlaştırma</span>
+                        <h3 class="font-display text-xl font-bold mt-3 mb-2">NEED & ESSENTIAL Projeleri</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Dezenformasyonla mücadele ve eleştirel düşünme becerilerini geliştiren <strong>NEED (Haber Okuryazarlığı Kutu Oyunu)</strong> ile çevrimiçi kitlesel açık ders (MOOC) tabanlı <strong>ESSENTIAL Dijital Okuryazarlık</strong> uluslararası araştırma projeleri.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="text-cyan-400"><i class="fa-solid fa-earth-europe mr-1"></i>AB Erasmus+ İşbirliği</span>
+                        <span class="text-slate-400">Haber Okuryazarlığı</span>
+                    </div>
+                </article>
+
+                <!-- Kart 4: Hacettepe BBY & Eğitim Teknolojileri -->
+                <article data-category="open" class="academic-card glass-card rounded-3xl p-6 sm:p-7 neon-border transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-network-wired"></i>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 font-mono text-xs">Hacettepe Üniversitesi</span>
+                        <h3 class="font-display text-xl font-bold mt-3 mb-2">Bilgi ve Belge Yönetimi & Bilişim</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Bilgi organizasyonu, kurumsal akademik arşivler, uzaktan eğitim sistemleri, açık kaynaklı kütüphane otomasyon sistemleri ve veritabanı yönetim sistemleri üzerine lisans ve lisansüstü düzeyde dersler ve tez danışmanlıkları.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="text-blue-400"><i class="fa-solid fa-building-columns mr-1"></i>Beytepe Kampüsü</span>
+                        <span class="text-slate-400">Açık Ders Malzemeleri</span>
+                    </div>
+                </article>
+
+                <!-- Kart 5: Yapay Zeka ve Akademik Dürüstlük -->
+                <article data-category="media" class="academic-card glass-card rounded-3xl p-6 sm:p-7 neon-border transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 font-mono text-xs">Yapay Zeka & Etik</span>
+                        <h3 class="font-display text-xl font-bold mt-3 mb-2">Bilimsel Araştırmalarda Yapay Zeka</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Büyük Dil Modelleri (LLM), otonom ajanlar ve yapay zeka asistanlarının literatür taraması, veri analizi ve akademik yazım süreçlerinde etik, şeffaf ve verimli kullanımına yönelik rehberler, seminerler ve iş akışları.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="text-amber-400"><i class="fa-solid fa-robot mr-1"></i>AI Okuryazarlığı</span>
+                        <a href="#ai-lab" class="text-cyan-400 hover:underline">YZ Lab'a Git &rarr;</a>
+                    </div>
+                </article>
+
+                <!-- Kart 6: Finansal ve Dijital Okuryazarlık -->
+                <article data-category="projects" class="academic-card glass-card rounded-3xl p-6 sm:p-7 neon-border transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-400 flex items-center justify-center text-2xl mb-5">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-md bg-rose-500/10 text-rose-400 font-mono text-xs">Veri & Analiz</span>
+                        <h3 class="font-display text-xl font-bold mt-3 mb-2">Veri, Algoritmik Düşünme & Okuryazarlık</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Bireylerin çağdaş bilgi toplumunda karşılaştığı veri akışlarını doğru yorumlaması; medya, bilgi, yapay zeka ve finansal okuryazarlık yetkinliklerinin bütünleşik bir yaklaşımla güçlendirilmesi.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="text-rose-400"><i class="fa-solid fa-magnifying-glass-chart mr-1"></i>Eleştirel Analiz</span>
+                        <span class="text-slate-400">Yaşam Boyu Öğrenme</span>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- 3. YAPAY ZEKA & AÇIK LİSANS LABORATUVARI -->
+        <section id="ai-lab" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-10">
+                <div class="inline-flex items-center space-x-2 text-emerald-500 font-mono text-xs uppercase tracking-widest mb-2">
+                    <i class="fa-solid fa-flask"></i>
+                    <span>Bölüm 02 // Yapay Zeka & Otomasyon Laboratuvarı</span>
+                </div>
+                <h2 class="font-display text-3xl sm:text-4xl font-bold">İnteraktif Açık Lisans Seçici & YZ İş Akışları</h2>
+                <p class="text-slate-600 dark:text-slate-400 mt-2 max-w-3xl">
+                    Ürettiğiniz bir akademik çalışmayı, ders materyalini veya veri setini nasıl lisanslamalısınız? Sağdaki <strong>Hızlı CC Lisans Seçici</strong> ile saniyeler içinde karar verin veya soldaki yapay zeka araştırma otomasyonu adımlarını inceleyin.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                
+                <!-- Sol: Yapay Zeka & Otomasyon İş Akışı Gösterimi -->
+                <div class="lg:col-span-6 glass-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 font-mono text-xs border border-cyan-500/20">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> AI Araştırma & Gündem Otomasyonu
+                            </span>
+                            <span class="font-mono text-xs text-slate-400">Pipeline v3.2</span>
+                        </div>
+
+                        <h3 class="font-display text-2xl font-bold mb-4">Akademi ve Günlük Üretimde Yapay Zeka</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mb-6">
+                            Her gün hızla değişen yapay zeka ekosistemini takip etmek, bilimsel literatürü sentezlemek ve açık eğitim materyalleri üretmek için kullandığım modüler iş akışı yaklaşımı:
+                        </p>
+
+                        <!-- Tıklanabilir İş Akışı Sekmeleri -->
+                        <div class="space-y-3" id="ai-workflow-steps">
+                            <div class="p-4 rounded-2xl bg-slate-900/50 dark:bg-slate-900/80 border border-cyan-500/30 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 font-mono font-bold flex items-center justify-center text-sm">01</span>
+                                        <h4 class="font-semibold text-white text-sm sm:text-base">Günlük YZ & Bilim Gündemi Kürasyonu</h4>
+                                    </div>
+                                    <span class="text-xs font-mono text-cyan-400">RSS + LLM Özeti</span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-300 mt-2 pl-11">
+                                    Yeni çıkan açık ağırlıklı modellerin, akademik makalelerin ve eğitim teknolojisi araçlarının otomatik taranması, sınıflandırılması ve haftalık yayın notlarına dönüştürülmesi.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-900/50 dark:bg-slate-900/80 border border-slate-800 hover:border-emerald-500/30 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 font-mono font-bold flex items-center justify-center text-sm">02</span>
+                                        <h4 class="font-semibold text-white text-sm sm:text-base">Bilimsel Literatür & Açık Veri Analizi</h4>
+                                    </div>
+                                    <span class="text-xs font-mono text-emerald-400">RAG & Semantik Arama</span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-300 mt-2 pl-11">
+                                    Açık erişimli makale havuzları üzerinde kaynak doğrulamalı (halüsinasyondan arındırılmış) sentezleme ve bibliyometrik ağ analizleri.
+                                </p>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-slate-900/50 dark:bg-slate-900/80 border border-slate-800 hover:border-purple-500/30 transition-all">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 font-mono font-bold flex items-center justify-center text-sm">03</span>
+                                        <h4 class="font-semibold text-white text-sm sm:text-base">Oyunlaştırma & Etkileşimli İçerik Üretimi</h4>
+                                    </div>
+                                    <span class="text-xs font-mono text-purple-400">OER & Simülasyon</span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-300 mt-2 pl-11">
+                                    Ders materyallerinin ve haber/finansal okuryazarlık senaryolarının öğrenciler için interaktif vaka analizlerine ve kutu/dijital oyun mekaniklerine aktarılması.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs font-mono text-slate-400">
+                        <span>İlkeler: Şeffaflık • Doğrulanabilirlik • Açık Lisans</span>
+                        <span class="text-emerald-400"><i class="fa-solid fa-shield-halved mr-1"></i>Etik YZ</span>
+                    </div>
+                </div>
+
+                <!-- Sağ: İnteraktif Creative Commons Hızlı Lisans Seçici -->
+                <div class="lg:col-span-6 glass-card rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/30 flex flex-col justify-between relative overflow-hidden">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 font-mono text-xs font-semibold">
+                                <i class="fa-brands fa-creative-commons mr-1"></i> İnteraktif Araç // CC Türkiye
+                            </span>
+                            <span class="text-xs font-mono text-slate-400">Sürüm 4.0 Uluslararası</span>
+                        </div>
+
+                        <h3 class="font-display text-2xl font-bold mb-2">Açık Lisans (CC) Hızlı Seçici</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mb-6">
+                            Eserinizin (makale, sunum, fotoğraf, veri seti) başkaları tarafından hangi koşullarla kullanılabileceğini belirlemek için aşağıdaki 2 soruyu yanıtlayın:
+                        </p>
+
+                        <!-- Soru 1: Ticari Kullanım -->
+                        <div class="space-y-5 mb-6">
+                            <div class="p-4 rounded-2xl bg-slate-200/50 dark:bg-slate-900/70 border border-slate-300/60 dark:border-slate-800">
+                                <label class="block text-sm font-semibold mb-2">
+                                    1. Eserinizin ticari amaçlarla kullanılmasına izin veriyor musunuz?
+                                </label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" data-cc-q="commercial" data-cc-val="yes" class="cc-btn py-2.5 px-3 rounded-xl font-mono text-xs font-semibold bg-emerald-500 text-white shadow">
+                                        Evet (Özgür Kültür)
+                                    </button>
+                                    <button type="button" data-cc-q="commercial" data-cc-val="no" class="cc-btn py-2.5 px-3 rounded-xl font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">
+                                        Hayır (Ticari Olmayan - NC)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Soru 2: Türetilmiş Eser / Değiştirme -->
+                            <div class="p-4 rounded-2xl bg-slate-200/50 dark:bg-slate-900/70 border border-slate-300/60 dark:border-slate-800">
+                                <label class="block text-sm font-semibold mb-2">
+                                    2. Eserinizin uyarlanmasına, değiştirilmesine veya geliştirilmesine izin veriyor musunuz?
+                                </label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button type="button" data-cc-q="adapt" data-cc-val="yes" class="cc-btn py-2.5 px-2 rounded-xl font-mono text-xs font-semibold bg-emerald-500 text-white shadow">
+                                        Evet
+                                    </button>
+                                    <button type="button" data-cc-q="adapt" data-cc-val="sa" class="cc-btn py-2.5 px-2 rounded-xl font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">
+                                        Aynı Lisansla (SA)
+                                    </button>
+                                    <button type="button" data-cc-q="adapt" data-cc-val="no" class="cc-btn py-2.5 px-2 rounded-xl font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">
+                                        Hayır (ND)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dinamik Lisans Sonuç Kutusu -->
+                    <div id="cc-result-box" class="p-5 rounded-2xl bg-gradient-to-br from-emerald-950/90 via-slate-900 to-cyan-950/90 border border-emerald-500/40 text-white">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                            <div class="flex items-center space-x-2 text-2xl text-emerald-400" id="cc-icons">
+                                <i class="fa-brands fa-creative-commons"></i>
+                                <i class="fa-brands fa-creative-commons-by"></i>
+                            </div>
+                            <span id="cc-badge" class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold border border-emerald-500/30">
+                                ÖNERİLEN AÇIK BİLİM LİSANSI
+                            </span>
+                        </div>
+                        <h4 id="cc-title" class="font-display text-xl font-bold text-white">CC BY 4.0 (Atıf 4.0 Uluslararası)</h4>
+                        <p id="cc-desc" class="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed">
+                            Size (eser sahibine) uygun şekilde atıfta bulunulması koşuluyla, başkalarının eserinizi ticari amaçlar da dahil olmak üzere her herhangi bir ortam veya biçimde dağıtmasına, yeniden düzenlemesine ve geliştirmesine izin verir. Açık erişim ve açık bilim için en çok tavsiye edilen lisanstır.
+                        </p>
+                        <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+                            <code id="cc-code" class="text-[11px] font-mono text-cyan-300 truncate max-w-[70%]">Bu eser CC BY 4.0 ile lisanslanmıştır.</code>
+                            <button id="copy-cc-btn" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-mono transition-colors flex items-center gap-1.5">
+                                <i class="fa-regular fa-copy"></i> <span>Metni Kopyala</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. DAYANIKLILIK & SPOR GÜNLÜĞÜ (ENDURANCE HUB) -->
+        <section id="endurance" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Üst Başlık -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+                <div>
+                    <div class="inline-flex items-center space-x-2 text-orange-500 font-mono text-xs uppercase tracking-widest mb-2">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                        <span>Bölüm 03 // Endurance Hub • Run / Bike / Tri</span>
+                    </div>
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold">Dayanıklılık Sporları, Yarışlar & Telemetri</h2>
+                    <p class="text-slate-600 dark:text-slate-400 mt-2 max-w-2xl">
+                        Akademik çalışmalardaki disiplinin fiziksel izdüşümü: Triatlon, maraton koşuları ve uzun mesafe yol/sanal bisiklet sürüşleri.
+                    </p>
+                </div>
+                <div class="flex items-center gap-3 font-mono text-xs">
+                    <span class="px-3 py-2 rounded-xl glass-card border-orange-500/30 text-orange-400 flex items-center gap-2">
+                        <i class="fa-solid fa-person-swimming"></i>
+                        <i class="fa-solid fa-person-biking"></i>
+                        <i class="fa-solid fa-person-running"></i>
+                        <span>SWIM • BIKE • RUN</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Üst Satır: Valencia Marathon Geri Sayım + Öne Çıkan Parkurlar -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+                
+                <!-- Valencia Marathon 2026 Canlı Geri Sayım Kartı -->
+                <div class="lg:col-span-7 glass-card rounded-3xl p-6 sm:p-8 border-2 border-orange-500/40 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -right-10 -top-10 w-44 h-44 bg-orange-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <span class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 font-mono text-xs font-bold flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                                HEDEF TAM MARATON GERİ SAYIM
+                            </span>
+                            <span class="font-mono text-xs text-slate-400"><i class="fa-solid fa-location-dot text-orange-400 mr-1"></i>Valensiya, İspanya</span>
+                        </div>
+
+                        <h3 class="font-display text-2xl sm:text-3xl font-bold">Valencia Marathon Trinidad Alfonso</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                            <strong>6 Aralık 2026 Pazar</strong> • "Ciudad del Running" düz ve hızlı parkurunda 42.195 metre heyecanı.
+                        </p>
+
+                        <!-- Canlı Geri Sayım Sayaç Kutuları -->
+                        <div class="grid grid-cols-4 gap-3 sm:gap-4 my-6" id="valencia-countdown">
+                            <div class="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-orange-500/30 text-center">
+                                <div id="cd-days" class="font-mono text-2xl sm:text-4xl font-bold text-orange-400">00</div>
+                                <div class="font-mono text-[10px] sm:text-xs text-slate-400 uppercase mt-1">Gün</div>
+                            </div>
+                            <div class="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-orange-500/30 text-center">
+                                <div id="cd-hours" class="font-mono text-2xl sm:text-4xl font-bold text-white">00</div>
+                                <div class="font-mono text-[10px] sm:text-xs text-slate-400 uppercase mt-1">Saat</div>
+                            </div>
+                            <div class="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-orange-500/30 text-center">
+                                <div id="cd-mins" class="font-mono text-2xl sm:text-4xl font-bold text-white">00</div>
+                                <div class="font-mono text-[10px] sm:text-xs text-slate-400 uppercase mt-1">Dakika</div>
+                            </div>
+                            <div class="p-3 sm:p-4 rounded-2xl bg-slate-900/80 border border-orange-500/30 text-center">
+                                <div id="cd-secs" class="font-mono text-2xl sm:text-4xl font-bold text-emerald-400">00</div>
+                                <div class="font-mono text-[10px] sm:text-xs text-slate-400 uppercase mt-1">Saniye</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Parkur Özeti Alt Bilgi -->
+                    <div class="grid grid-cols-3 gap-3 pt-4 border-t border-slate-200 dark:border-slate-800 text-xs font-mono">
+                        <div>
+                            <span class="text-slate-400 block">MESAFE</span>
+                            <span class="font-bold text-sm text-orange-400">42.195 KM</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block">PARKUR TİPİ</span>
+                            <span class="font-bold text-sm">Yol / Hızlı Düz</span>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block">HAZIRLIK FAZI</span>
+                            <span class="font-bold text-sm text-emerald-400">Tapering & Tempo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sağ: İkonik Yarış ve Antrenman Kilometre Taşları -->
+                <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
+                    
+                    <!-- Milestone 1: Ironman 70.3 -->
+                    <div class="glass-card rounded-2xl p-5 strava-border transition-all">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-xl bg-orange-500/15 text-orange-400 flex items-center justify-center text-xl shrink-0">
+                                    <i class="fa-solid fa-medal"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-mono text-orange-400 uppercase font-semibold">Triatlon • Half Ironman</span>
+                                    <h4 class="font-display font-bold text-lg">IRONMAN 70.3 Antalya</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">1.9K Yüzme • 90K Bisiklet • 21.1K Koşu (113 KM)</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 font-mono text-xs">Finisher</span>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 2: Bisiklet & Gran Fondo / ROUVY -->
+                    <div class="glass-card rounded-2xl p-5 strava-border transition-all">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center text-xl shrink-0">
+                                    <i class="fa-solid fa-bicycle"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-mono text-cyan-400 uppercase font-semibold">Yol & Dağ Bisikleti • Smart Trainer</span>
+                                    <h4 class="font-display font-bold text-lg">Gran Fondo & ROUVY Tırmanışları</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Uzun mesafe dayanıklılık sürüşleri, güç (Watt/FTP) odaklı iç mekan antrenmanları ve doğa rotaları.</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 font-mono text-xs">Aero & Climb</span>
+                        </div>
+                    </div>
+
+                    <!-- Milestone 3: Runkara & Yarı/Tam Maratonlar -->
+                    <div class="glass-card rounded-2xl p-5 strava-border transition-all">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3.5">
+                                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-xl shrink-0">
+                                    <i class="fa-solid fa-road"></i>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-mono text-emerald-400 uppercase font-semibold">Yol Koşuları • 21.1K & 42.2K</span>
+                                    <h4 class="font-display font-bold text-lg">Runkara, İstanbul & Avrupa Maratonları</h4>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Yarı maraton ve tam maraton yarışları, negatif split stratejileri ve sabah uzun antrenman koşuları.</p>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-400 font-mono text-xs">Cadence</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Alt Satır: İnteraktif Maraton Pace ve Bitiş Süresi Hesaplayıcı -->
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <div class="lg:col-span-5 space-y-3">
+                        <div class="inline-flex items-center space-x-2 text-emerald-400 font-mono text-xs">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>KOŞUCULAR İÇİN İNTERAKTİF ARAÇ</span>
+                        </div>
+                        <h3 class="font-display text-2xl font-bold">Maraton & Yarı Maraton Pace Hesaplayıcı</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">
+                            Hedeflediğiniz ortalama kilometre temposunu (dk/km) kaydırıcı ile seçin; <strong>10K, Yarı Maraton (21.1K) ve Tam Maraton (42.2K)</strong> tahmini bitiş sürelerinizi anında görün.
+                        </p>
+                        <!-- Hızlı Ön Ayarlı Pace Butonları -->
+                        <div class="pt-2 flex flex-wrap gap-2">
+                            <button type="button" data-pace="270" class="pace-preset px-3 py-1.5 rounded-lg text-xs font-mono bg-slate-800 text-slate-200 hover:bg-emerald-500 hover:text-white transition-colors">4:30 /km (Sub 3:10)</button>
+                            <button type="button" data-pace="300" class="pace-preset px-3 py-1.5 rounded-lg text-xs font-mono bg-emerald-500 text-white transition-colors">5:00 /km (Sub 3:35)</button>
+                            <button type="button" data-pace="325" class="pace-preset px-3 py-1.5 rounded-lg text-xs font-mono bg-slate-800 text-slate-200 hover:bg-emerald-500 hover:text-white transition-colors">5:25 /km (Sub 3:50)</button>
+                            <button type="button" data-pace="340" class="pace-preset px-3 py-1.5 rounded-lg text-xs font-mono bg-slate-800 text-slate-200 hover:bg-emerald-500 hover:text-white transition-colors">5:40 /km (Sub 4:00)</button>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 space-y-6">
+                        <!-- Slider Kontrolü -->
+                        <div class="p-5 rounded-2xl bg-slate-900/75 text-white border border-slate-800">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-mono text-slate-400 uppercase">HEDEF ORTALAMA PACE (DK/KM)</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="pace-display" class="font-mono text-3xl font-bold text-emerald-400">5:00</span>
+                                    <span class="font-mono text-xs text-slate-400">dk/km (<span id="speed-display">12.0</span> km/s)</span>
+                                </div>
+                            </div>
+                            <input id="pace-slider" type="range" min="210" max="450" value="300" step="1" aria-label="Hedef Pace" class="w-full">
+                            <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-2">
+                                <span>3:30 /km (Elit/Hızlı)</span>
+                                <span>5:00 /km (Tempo)</span>
+                                <span>7:30 /km (Rahat/Dayanıklılık)</span>
+                            </div>
+                        </div>
+
+                        <!-- Tahmini Süre Çıktıları -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+                            <div class="p-3.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900/60 border border-slate-300/50 dark:border-slate-800">
+                                <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400">5K GEÇİŞ</div>
+                                <div id="time-5k" class="font-mono text-lg sm:text-xl font-bold mt-1">00:25:00</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900/60 border border-slate-300/50 dark:border-slate-800">
+                                <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400">10K BİTİŞ</div>
+                                <div id="time-10k" class="font-mono text-lg sm:text-xl font-bold mt-1 text-cyan-500">00:50:00</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900/60 border border-slate-300/50 dark:border-slate-800">
+                                <div class="text-[11px] font-mono text-slate-500 dark:text-slate-400">YARI MARATON (21.1K)</div>
+                                <div id="time-hm" class="font-mono text-lg sm:text-xl font-bold mt-1 text-emerald-500">01:45:29</div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-orange-500/10 border border-orange-500/40">
+                                <div class="text-[11px] font-mono text-orange-400 font-semibold">MARATON (42.2K)</div>
+                                <div id="time-fm" class="font-mono text-lg sm:text-xl font-bold mt-1 text-orange-400">03:30:58</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. GÜNDEM, YAYINLAR VE BAĞLANTI MERKEZİ -->
+        <section id="akis" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 border border-cyan-500/20">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+                    
+                    <div class="lg:col-span-7 space-y-4">
+                        <span class="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 font-mono text-xs">
+                            <i class="fa-solid fa-satellite-dish mr-1"></i> Dijital Ekosistem & Bağlantılar
+                        </span>
+                        <h2 class="font-display text-3xl sm:text-4xl font-bold">Açık Bilim ve Dayanıklılık Yolculuğuna Katılın</h2>
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Haftalık <strong>Akademiden Notlar</strong> yayınlarını takip etmek, açık ders malzemelerine ve sunumlara ulaşmak veya antrenman rotalarına göz atmak için aşağıdaki platformlar üzerinden bağlantı kurabilirsiniz.
+                        </p>
+
+                        <!-- Hızlı Platform Kartları -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4">
+                            <a href="https://madran.net" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl bg-slate-200/60 dark:bg-slate-900/80 hover:border-cyan-500/50 border border-transparent transition-all flex items-center gap-3 group">
+                                <i class="fa-solid fa-globe text-xl text-cyan-400 group-hover:scale-110 transition-transform"></i>
+                                <div>
+                                    <div class="font-semibold text-sm">madran.net</div>
+                                    <div class="text-[11px] font-mono text-slate-400">Kişisel Blog & Arşiv</div>
+                                </div>
+                            </a>
+                            <a href="https://www.youtube.com/@orcunmadran" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl bg-slate-200/60 dark:bg-slate-900/80 hover:border-red-500/50 border border-transparent transition-all flex items-center gap-3 group">
+                                <i class="fa-brands fa-youtube text-xl text-red-500 group-hover:scale-110 transition-transform"></i>
+                                <div>
+                                    <div class="font-semibold text-sm">YouTube</div>
+                                    <div class="text-[11px] font-mono text-slate-400">Akademiden Notlar</div>
+                                </div>
+                            </a>
+                            <a href="https://creativecommons.org.tr" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl bg-slate-200/60 dark:bg-slate-900/80 hover:border-emerald-500/50 border border-transparent transition-all flex items-center gap-3 group">
+                                <i class="fa-brands fa-creative-commons text-xl text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                                <div>
+                                    <div class="font-semibold text-sm">CC Türkiye</div>
+                                    <div class="text-[11px] font-mono text-slate-400">Açık Lisanslar</div>
+                                </div>
+                            </a>
+                            <a href="https://github.com/omadran" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl bg-slate-200/60 dark:bg-slate-900/80 hover:border-slate-400/50 border border-transparent transition-all flex items-center gap-3 group">
+                                <i class="fa-brands fa-github text-xl text-slate-700 dark:text-slate-200 group-hover:scale-110 transition-transform"></i>
+                                <div>
+                                    <div class="font-semibold text-sm">GitHub</div>
+                                    <div class="text-[11px] font-mono text-slate-400">Açık Kaynak Kod</div>
+                                </div>
+                            </a>
+                            <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl bg-slate-200/60 dark:bg-slate-900/80 hover:border-orange-500/50 border border-transparent transition-all flex items-center gap-3 group">
+                                <i class="fa-brands fa-strava text-xl text-orange-500 group-hover:scale-110 transition-transform"></i>
+                                <div>
+                                    <div class="font-semibold text-sm">Strava</div>
+                                    <div class="text-[11px] font-mono text-slate-400">Koşu & Bisiklet</div>
+                                </div>
+                            </a>
+                            <a href="https://bby.hacettepe.edu.tr" target="_blank" rel="noopener noreferrer" class="p-4 rounded-2xl bg-slate-200/60 dark:bg-slate-900/80 hover:border-blue-500/50 border border-transparent transition-all flex items-center gap-3 group">
+                                <i class="fa-solid fa-university text-xl text-blue-400 group-hover:scale-110 transition-transform"></i>
+                                <div>
+                                    <div class="font-semibold text-sm">Hacettepe BBY</div>
+                                    <div class="text-[11px] font-mono text-slate-400">Akademik Bölüm</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Sağ: Hızlı Not / Etkileşim Kutusu -->
+                    <div class="lg:col-span-5">
+                        <div class="p-6 rounded-2xl bg-slate-900/90 text-white border border-slate-800 space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="font-mono text-xs text-emerald-400"><i class="fa-solid fa-quote-left mr-1"></i> GÜNÜN MOTTOSU</span>
+                                <button id="next-quote-btn" class="text-xs font-mono text-cyan-400 hover:underline">Değiştir <i class="fa-solid fa-rotate ml-1"></i></button>
+                            </div>
+                            <blockquote id="quote-text" class="font-display text-lg font-medium leading-snug text-slate-100">
+                                "Bilgi paylaştıkça çoğalır; açık bilim ve açık eğitim kaynakları, daha adil ve yenilikçi bir geleceğin temel taşıdır."
+                            </blockquote>
+                            <div id="quote-tag" class="text-xs font-mono text-slate-400">— Açık Bilim & Kültür Notları</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bilgilendirme Toast Mesajı (Kopyalama vb. için) -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden px-5 py-3 rounded-2xl bg-emerald-600 text-white font-mono text-xs shadow-xl flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-msg">Panoya kopyalandı!</span>
+    </div>
+
+    <!-- FOOTER (CC BY 4.0 Lisans Rozeti ile) -->
+    <footer class="relative z-10 border-t border-slate-200 dark:border-slate-800/80 py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+            <div class="flex items-center space-x-3">
+                <span class="text-xl text-emerald-500 flex items-center gap-1">
+                    <i class="fa-brands fa-creative-commons"></i>
+                    <i class="fa-brands fa-creative-commons-by"></i>
+                </span>
+                <span>
+                    <strong>Dr. Orçun Madran</strong> — Bu sayfa <a href="https://creativecommons.org/licenses/by/4.0/deed.tr" target="_blank" rel="noopener noreferrer" class="text-cyan-500 hover:underline font-medium">Creative Commons Atıf 4.0 Uluslararası (CC BY 4.0)</a> ile lisanslanmıştır. Açık Bilim ve Açık Kültür ruhuyla.
+                </span>
+            </div>
+            <div class="font-mono">
+                <span>Ankara, TR • <a href="#hero" class="hover:text-cyan-400">Yukarı Çık &uarr;</a></span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT: Tüm Etkileşimler, Sayaçlar ve Araçlar -->
+    <script>
+        // 1. Daktilo (Typewriter) Efekti
+        const roles = [
+            "Akademisyen • Hacettepe Üniversitesi BBY",
+            "Açık Bilim & Creative Commons Türkiye Savunucusu",
+            "Dayanıklılık Sporcusu • Triatlon, Maraton & Bisiklet",
+            "Yapay Zeka, Dijital Okuryazarlık & Oyunlaştırma Meraklısı"
+        ];
+        let roleIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typeTarget = document.getElementById('typewriter-text');
+
+        function typeEffect() {
+            const currentRole = roles[roleIndex];
+            if (isDeleting) {
+                typeTarget.textContent = currentRole.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typeTarget.textContent = currentRole.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let speed = isDeleting ? 30 : 65;
+
+            if (!isDeleting && charIndex === currentRole.length) {
+                speed = 2200; // Cümle sonunda bekle
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % roles.length;
+                speed = 400;
+            }
+            setTimeout(typeEffect, speed);
+        }
+
+        // 2. Tema Değiştirici (Dark Cyber / Clean Academic Light)
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        themeToggleBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // Mobil Menü Kontrolü
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // 3. Akademik Proje Filtreleme
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const academicCards = document.querySelectorAll('.academic-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-cyan-500', 'text-white', 'font-semibold');
+                    b.classList.add('glass-card');
+                });
+                btn.classList.add('bg-cyan-500', 'text-white', 'font-semibold');
+                btn.classList.remove('glass-card');
+
+                const filterVal = btn.getAttribute('data-filter');
+                academicCards.forEach(card => {
+                    if (filterVal === 'all' || card.getAttribute('data-category') === filterVal) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // 4. İnteraktif Creative Commons (CC) Hızlı Lisans Seçici
+        const ccState = { commercial: 'yes', adapt: 'yes' };
+        const ccLicenses = {
+            'yes_yes': {
+                title: 'CC BY 4.0 (Atıf 4.0 Uluslararası)',
+                badge: 'ÖNERİLEN AÇIK BİLİM LİSANSI',
+                icons: ['fa-creative-commons', 'fa-creative-commons-by'],
+                desc: 'Size uygun şekilde atıfta bulunulması koşuluyla, başkalarının eserinizi ticari amaçlar da dahil olmak üzere her ortamda dağıtmasına, yeniden düzenlemesine ve geliştirmesine izin verir.',
+                code: 'Bu eser Creative Commons Atıf 4.0 Uluslararası Lisansı (CC BY 4.0) ile lisanslanmıştır.'
+            },
+            'yes_sa': {
+                title: 'CC BY-SA 4.0 (Atıf-AynıLisanslaPaylaş 4.0)',
+                badge: 'ÖZGÜR KÜLTÜR & VİKİPEDİ LİSANSI',
+                icons: ['fa-creative-commons', 'fa-creative-commons-by', 'fa-creative-commons-sa'],
+                desc: 'Atıfta bulunulması ve türetilen yeni eserlerin de aynı lisansla (CC BY-SA) paylaşılması koşuluyla ticari kullanıma ve değiştirmeye izin verir.',
+                code: 'Bu eser Creative Commons Atıf-AynıLisanslaPaylaş 4.0 (CC BY-SA 4.0) ile lisanslanmıştır.'
+            },
+            'yes_no': {
+                title: 'CC BY-ND 4.0 (Atıf-Türetilemez 4.0)',
+                badge: 'DEĞİŞTİRİLEMEZ PAYLAŞIM',
+                icons: ['fa-creative-commons', 'fa-creative-commons-by', 'fa-creative-commons-nd'],
+                desc: 'Eserin üzerinde hiçbir değişiklik yapılmaması ve size atıfta bulunulması koşuluyla ticari ve ticari olmayan yeniden paylaşıma izin verir.',
+                code: 'Bu eser Creative Commons Atıf-Türetilemez 4.0 (CC BY-ND 4.0) ile lisanslanmıştır.'
+            },
+            'no_yes': {
+                title: 'CC BY-NC 4.0 (Atıf-TicariOlmayan 4.0)',
+                badge: 'TİCARİ OLMAYAN AÇIK LİSANS',
+                icons: ['fa-creative-commons', 'fa-creative-commons-by', 'fa-creative-commons-nc'],
+                desc: 'Ticari amaçlarla kullanılmaması ve size atıfta bulunulması koşuluyla eserinizi geliştirmeye, uyarlamaya ve paylaşmaya izin verir.',
+                code: 'Bu eser Creative Commons Atıf-TicariOlmayan 4.0 (CC BY-NC 4.0) ile lisanslanmıştır.'
+            },
+            'no_sa': {
+                title: 'CC BY-NC-SA 4.0 (Atıf-TicariOlmayan-AynıLisanslaPaylaş)',
+                badge: 'EĞİTİM MATERYALLERİNDE YAYGIN',
+                icons: ['fa-creative-commons', 'fa-creative-commons-by', 'fa-creative-commons-nc', 'fa-creative-commons-sa'],
+                desc: 'Yalnızca ticari olmayan amaçlarla, size atıfta bulunarak ve yeni üretilen eseri de aynı lisansla paylaşarak uyarlama yapılmasına izin verir.',
+                code: 'Bu eser CC BY-NC-SA 4.0 Uluslararası Lisansı ile lisanslanmıştır.'
+            },
+            'no_no': {
+                title: 'CC BY-NC-ND 4.0 (Atıf-TicariOlmayan-Türetilemez)',
+                badge: 'EN KISITLAYICI CC LİSANSI',
+                icons: ['fa-creative-commons', 'fa-creative-commons-by', 'fa-creative-commons-nc', 'fa-creative-commons-nd'],
+                desc: 'Eserin değiştirilmemesi ve ticari amaç güdülmemesi şartıyla, yalnızca size atıfta bulunarak indirilmesine ve paylaşılmasına izin verir.',
+                code: 'Bu eser CC BY-NC-ND 4.0 Uluslararası Lisansı ile lisanslanmıştır.'
+            }
+        };
+
+        function updateCCUI() {
+            const key = `${ccState.commercial}_${ccState.adapt}`;
+            const data = ccLicenses[key];
+            document.getElementById('cc-title').textContent = data.title;
+            document.getElementById('cc-badge').textContent = data.badge;
+            document.getElementById('cc-desc').textContent = data.desc;
+            document.getElementById('cc-code').textContent = data.code;
+
+            const iconsContainer = document.getElementById('cc-icons');
+            iconsContainer.innerHTML = data.icons.map(ic => `<i class="fa-brands ${ic}"></i>`).join('');
+        }
+
+        document.querySelectorAll('.cc-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const q = btn.getAttribute('data-cc-q');
+                const val = btn.getAttribute('data-cc-val');
+                ccState[q] = val;
+
+                // Aktif buton stilini güncelle
+                document.querySelectorAll(`.cc-btn[data-cc-q="${q}"]`).forEach(sibling => {
+                    sibling.className = 'cc-btn py-2.5 px-2 rounded-xl font-mono text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700';
+                });
+                btn.className = 'cc-btn py-2.5 px-2 rounded-xl font-mono text-xs font-semibold bg-emerald-500 text-white shadow';
+
+                updateCCUI();
+            });
+        });
+
+        // CC Metnini Panoya Kopyalama
+        document.getElementById('copy-cc-btn').addEventListener('click', () => {
+            const text = document.getElementById('cc-code').textContent;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = 'Lisans bildirimi panoya kopyalandı!';
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2800);
+        });
+
+        // 5. Valencia Marathon (6 Aralık 2026 08:15 CET) Canlı Geri Sayım
+        const raceDate = new Date('2026-12-06T08:15:00+01:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = raceDate - now;
+
+            if (diff <= 0) {
+                document.getElementById('cd-days').textContent = '00';
+                document.getElementById('cd-hours').textContent = '00';
+                document.getElementById('cd-mins').textContent = '00';
+                document.getElementById('cd-secs').textContent = '00';
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('cd-days').textContent = String(days).padStart(2, '0');
+            document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
+            document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 6. Maraton Pace Hesaplayıcı
+        const paceSlider = document.getElementById('pace-slider');
+
+        function formatSecondsToHMS(totalSeconds) {
+            const hrs = Math.floor(totalSeconds / 3600);
+            const mins = Math.floor((totalSeconds % 3600) / 60);
+            const secs = Math.round(totalSeconds % 60);
+            return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function updatePaceCalculator(secPerKm) {
+            const mins = Math.floor(secPerKm / 60);
+            const secs = secPerKm % 60;
+            document.getElementById('pace-display').textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+
+            const speedKmh = (3600 / secPerKm).toFixed(1);
+            document.getElementById('speed-display').textContent = speedKmh;
+
+            document.getElementById('time-5k').textContent = formatSecondsToHMS(secPerKm * 5);
+            document.getElementById('time-10k').textContent = formatSecondsToHMS(secPerKm * 10);
+            document.getElementById('time-hm').textContent = formatSecondsToHMS(secPerKm * 21.0975);
+            document.getElementById('time-fm').textContent = formatSecondsToHMS(secPerKm * 42.195);
+        }
+
+        paceSlider.addEventListener('input', (e) => {
+            updatePaceCalculator(parseInt(e.target.value, 10));
+        });
+
+        document.querySelectorAll('.pace-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const val = parseInt(btn.getAttribute('data-pace'), 10);
+                paceSlider.value = val;
+                updatePaceCalculator(val);
+            });
+        });
+
+        // 7. Motto / Söz Değiştirici
+        const quotes = [
+            {
+                text: '"Bilgi paylaştıkça çoğalır; açık bilim ve açık eğitim kaynakları, daha adil ve yenilikçi bir geleceğin temel taşıdır."',
+                tag: '— Açık Bilim & Kültür Notları'
+            },
+            {
+                text: '"Maraton sadece 42 kilometrelik bir yarış değil; aylarca süren sabrın, disiplinin ve zihinsel dayanıklılığın kutlamasıdır."',
+                tag: '— Endurance & Maraton Günlüğü'
+            },
+            {
+                text: '"Yapay zeka araçları araştırmacının yerini almak için değil; etik ve eleştirel akılla kullanıldığında bilimsel keşfi hızlandırmak içindir."',
+                tag: '— Akademiden Notlar'
+            }
+        ];
+        let quoteIdx = 0;
+        document.getElementById('next-quote-btn').addEventListener('click', () => {
+            quoteIdx = (quoteIdx + 1) % quotes.length;
+            document.getElementById('quote-text').textContent = quotes[quoteIdx].text;
+            document.getElementById('quote-tag').textContent = quotes[quoteIdx].tag;
+        });
+
+        // 8. Hafif Arka Plan Parçacık Ağı (Canvas)
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(Math.floor(window.innerWidth / 28), 45);
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    r: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.35)';
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if (dist < 130) {
+                        ctx.strokeStyle = `rgba(16, 185, 129, ${0.12 * (1 - dist / 130)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+
+        window.onload = function () {
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+            typeEffect();
+            updatePaceCalculator(300);
+        };
+    </script>
+</body>
+</html>
